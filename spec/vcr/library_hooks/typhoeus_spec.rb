@@ -6,12 +6,12 @@ describe "Typhoeus hook", :with_monkey_patches => :typhoeus do
   end
 
   def disable_real_connections
-    ::Typhoeus::Hydra.allow_net_connect = false
+    ::Typhoeus::Config.block_connection = true
     ::Typhoeus::Hydra::NetConnectNotAllowedError
   end
 
   def enable_real_connections
-    ::Typhoeus::Hydra.allow_net_connect = true
+    ::Typhoeus::Config.block_connection = false
   end
 
   def directly_stub_request(method, url, response_body)

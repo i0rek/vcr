@@ -66,12 +66,13 @@ module VCR
           response.http_version
       end
 
-      ::Typhoeus::Hydra.after_request_before_on_complete do |request|
+      ::Typhoeus.on_complete do |response|
+        request = response.request
         unless VCR.library_hooks.disabled?(:typhoeus)
-          vcr_response = vcr_response_from(request.response)
+          vcr_response = vcr_response_from(response)
           typed_vcr_request = request.send(:remove_instance_variable, :@__typed_vcr_request)
 
-          unless request.response.mock?
+          unless request.response.mock
             http_interaction = VCR::HTTPInteraction.new(typed_vcr_request, vcr_response)
             VCR.record_http_interaction(http_interaction)
           end

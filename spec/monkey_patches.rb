@@ -28,10 +28,8 @@ module MonkeyPatches
           ::WebMock::CallbackRegistry.add_callback(cb[:options], cb[:block])
         end
       when :typhoeus
-        ::Typhoeus::Hydra.global_hooks = $original_typhoeus_global_hooks
-        ::Typhoeus::Hydra.stub_finders.clear
-        $original_typhoeus_stub_finders.each do |finder|
-          ::Typhoeus::Hydra.stub_finders << finder
+        $original_typhoeus_global_hooks.each do |hook|
+          ::Typhoeus.on_complete << hook
         end
       when :excon
         $original_excon_stubs.each do |stub|
@@ -56,7 +54,7 @@ module MonkeyPatches
     end
 
     if defined?(::Typhoeus)
-      ::Typhoeus::Hydra.clear_global_hooks
+      ::Typhoeus.on_complete.clear
       ::Typhoeus::Hydra.stub_finders.clear
     end
 
@@ -130,12 +128,12 @@ unless RUBY_INTERPRETER == :jruby
   require 'patron'
   require 'em-http-request'
   require 'curb'
-
-  require 'vcr/library_hooks/typhoeus'
-  $typhoeus_after_loaded_hook = VCR.configuration.hooks[:after_library_hooks_loaded].last
-  $original_typhoeus_global_hooks = Typhoeus::Hydra.global_hooks.dup
   $original_typhoeus_stub_finders = Typhoeus::Hydra.stub_finders.dup
 end
+
+require 'vcr/library_hooks/typhoeus'
+$typhoeus_after_loaded_hook = VCR.configuration.hooks[:after_library_hooks_loaded].last
+$original_typhoeus_global_hooks = Typhoeus.on_complete.dup
 
 require 'vcr/library_hooks/fakeweb'
 $fakeweb_after_loaded_hook = VCR.configuration.hooks[:after_library_hooks_loaded].last

@@ -26,7 +26,7 @@ module VCR
       private
 
         def externally_stubbed?
-          ::Typhoeus::Hydra.stubs.detect { |stub| stub.matches?(request) }
+          ::Typhoeus::Expectation.find_by(request)
         end
 
         def set_typed_request_for_after_hook(*args)

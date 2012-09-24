@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe "Typhoeus hook", :with_monkey_patches => :typhoeus do
   after(:each) do
-    ::Typhoeus::Hydra.clear_stubs
+    ::Typhoeus::Expectation.clear
   end
 
   def disable_real_connections
     ::Typhoeus::Config.block_connection = true
-    ::Typhoeus::Hydra::NetConnectNotAllowedError
+    ::Typhoeus::Errors::NoStub
   end
 
   def enable_real_connections
@@ -16,7 +16,7 @@ describe "Typhoeus hook", :with_monkey_patches => :typhoeus do
 
   def directly_stub_request(method, url, response_body)
     response = ::Typhoeus::Response.new(:code => 200, :body => response_body)
-    ::Typhoeus::Hydra.stub(method, url).and_return(response)
+    ::Typhoeus.stub(url, :method => method).and_return(response)
   end
 
   it_behaves_like 'a hook into an HTTP library', :typhoeus, 'typhoeus'
@@ -27,5 +27,5 @@ describe "Typhoeus hook", :with_monkey_patches => :typhoeus do
       $typhoeus_after_loaded_hook.conditionally_invoke
     end
   end
-end unless RUBY_PLATFORM == 'java'
+end
 

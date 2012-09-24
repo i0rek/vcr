@@ -17,10 +17,10 @@ module VCR
 
         def vcr_request
           @vcr_request ||= VCR::Request.new \
-            request.options[:method],
+            request.options.fetch(:method, :get),
             request.url,
-            request.options[:body],
-            request.options[:headers]
+            request.options.fetch(:body, ""),
+            request.options.fetch(:headers, {})
         end
 
       private

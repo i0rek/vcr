@@ -81,8 +81,12 @@ module VCR
         end
       end
 
-      ::Typhoeus::Hydra.register_stub_finder do |request|
-        VCR::LibraryHooks::Typhoeus::RequestHandler.new(request).handle
+      ::Typhoeus.before do |request|
+        if response = VCR::LibraryHooks::Typhoeus::RequestHandler.new(request).handle
+          request.finish(response)
+        else
+          true
+        end
       end
     end
   end

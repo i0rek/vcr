@@ -31,6 +31,10 @@ module MonkeyPatches
         $original_typhoeus_global_hooks.each do |hook|
           ::Typhoeus.on_complete << hook
         end
+        ::Typhoeus.before.clear
+        $original_typhoeus_before_hooks.each do |hook|
+          ::Typhoeus.before << hook
+        end
       when :excon
         $original_excon_stubs.each do |stub|
           ::Excon.stubs << stub
@@ -55,7 +59,7 @@ module MonkeyPatches
 
     if defined?(::Typhoeus)
       ::Typhoeus.on_complete.clear
-      ::Typhoeus::Hydra.stub_finders.clear
+      ::Typhoeus.before.clear
     end
 
     if defined?(::Excon)
@@ -128,12 +132,12 @@ unless RUBY_INTERPRETER == :jruby
   require 'patron'
   require 'em-http-request'
   require 'curb'
-  $original_typhoeus_stub_finders = Typhoeus::Hydra.stub_finders.dup
 end
 
 require 'vcr/library_hooks/typhoeus'
 $typhoeus_after_loaded_hook = VCR.configuration.hooks[:after_library_hooks_loaded].last
 $original_typhoeus_global_hooks = Typhoeus.on_complete.dup
+$original_typhoeus_before_hooks = Typhoeus.before.dup
 
 require 'vcr/library_hooks/fakeweb'
 $fakeweb_after_loaded_hook = VCR.configuration.hooks[:after_library_hooks_loaded].last

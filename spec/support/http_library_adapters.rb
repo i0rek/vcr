@@ -160,7 +160,7 @@ HTTP_LIBRARY_ADAPTERS['typhoeus'] = Module.new do
   alias get_body_object get_body_string
 
   def get_header(header_key, response)
-    response.headers_hash[header_key]
+    response.headers[header_key]
   end
 
   def make_http_request(method, url, body = nil, headers = {})

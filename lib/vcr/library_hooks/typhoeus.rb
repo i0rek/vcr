@@ -44,7 +44,7 @@ module VCR
             :http_version   => stubbed_response.http_version,
             :code           => stubbed_response.status.code,
             :status_message => stubbed_response.status.message,
-            :headers_hash   => stubbed_response_headers,
+            :headers        => stubbed_response_headers,
             :body           => stubbed_response.body
         end
 
@@ -61,7 +61,7 @@ module VCR
       def self.vcr_response_from(response)
         VCR::Response.new \
           VCR::ResponseStatus.new(response.code, response.status_message),
-          response.headers_hash,
+          response.headers,
           response.body,
           response.http_version
       end

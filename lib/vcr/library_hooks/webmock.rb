@@ -128,16 +128,12 @@ module VCR
       end
 
       ::WebMock.after_request(:real_requests_only => true) do |request, response|
-        ret = nil
         unless VCR.library_hooks.disabled?(:webmock)
-          ::Typhoeus.with_connection do
-            http_interaction = VCR::HTTPInteraction.new \
-              typed_request_for(request), vcr_response_for(response)
+          http_interaction = VCR::HTTPInteraction.new \
+            typed_request_for(request), vcr_response_for(response)
 
-            ret = VCR.record_http_interaction(http_interaction)
-          end
+          VCR.record_http_interaction(http_interaction)
         end
-        ret
       end
 
       ::WebMock.after_request do |request, response|

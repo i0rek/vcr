@@ -17,10 +17,10 @@ module VCR
 
         def vcr_request
           @vcr_request ||= VCR::Request.new \
-            request.method,
+            request.options[:method],
             request.url,
-            request.body,
-            request.headers
+            request.options[:body],
+            request.options[:headers]
         end
 
       private

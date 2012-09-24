@@ -164,7 +164,15 @@ HTTP_LIBRARY_ADAPTERS['typhoeus'] = Module.new do
   end
 
   def make_http_request(method, url, body = nil, headers = {})
-    Typhoeus::Request.send(method, url, :body => body, :headers => headers)
+    request = Typhoeus::Request.new(url, :method => method, :body => body, :headers => headers)
+    if VCR.turned_on?
+      Typhoeus.with_connection do
+        request.run
+      end
+    else
+      request.run
+    end
+    request.response
   end
 
   def normalize_request_headers(headers)
